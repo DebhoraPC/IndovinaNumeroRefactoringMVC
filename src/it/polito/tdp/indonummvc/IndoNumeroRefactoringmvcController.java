@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.util.converter.NumberStringConverter;
 
 public class IndoNumeroRefactoringmvcController {
 	
@@ -49,7 +50,7 @@ public class IndoNumeroRefactoringmvcController {
     	btnNuova.setDisable(true); // disattivo il bottono Nuova Partita
     	boxGioco.setDisable(false); // attivo HBox con Tentativo e bottone Prova
     	
-    	txtCurr.setText(String.format("%d", model.getTentativi())); 
+    	//txtCurr.setText(String.format("%d", model.getTentativi())); 
     	txtMax.setText(String.format("%d", model.getTMAX())); 
     	
     	txtLog.clear();
@@ -79,7 +80,7 @@ public class IndoNumeroRefactoringmvcController {
     		}
     		
     		int risultato = model.tentativo(num);
-        	txtCurr.setText(String.format("%d", model.getTentativi())); 
+        	//txtCurr.setText(String.format("%d", model.getTentativi())); 
 
     		
     		if(risultato == 0) {
@@ -122,6 +123,10 @@ public class IndoNumeroRefactoringmvcController {
     }
 
 	public void setModel(Model model) {
+		
 		this.model = model;
+		
+		txtCurr.textProperty().bindBidirectional(model.tentativiProperty(), new NumberStringConverter());
 	}
+	
 }

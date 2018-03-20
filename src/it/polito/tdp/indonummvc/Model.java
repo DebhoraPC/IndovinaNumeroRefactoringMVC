@@ -2,13 +2,18 @@ package it.polito.tdp.indonummvc;
 
 import java.security.InvalidParameterException;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class Model {
 	
 	private int NMAX = 100;
 	private int TMAX = 7; // log2(100) = 6.64 RICERCA DICOTOMICA
 	
 	private int segreto; // NUMERO DA INDOVINARE
-	private int tentativi; // NUMERO DI TENTATIVI FATTI DALL'UTENTE
+	
+	//private int tentativi; // NUMERO DI TENTATIVI FATTI DALL'UTENTE
+	private IntegerProperty tentativi = new SimpleIntegerProperty(); // ora è un oggetto intero osservabile
 	
 	private boolean inGame;
 	
@@ -25,7 +30,7 @@ public class Model {
         // IN [0,100) POI LO TRASFORMO IN UN INTERO E SOMMO 1 COSI' HO UN NUMERO CASUALE IN [1,100]
 		
 		this.segreto = (int)(Math.random()*NMAX) + 1; 
-    	this.tentativi = 0;
+    	this.tentativi.set(0); // pongo tentativi = 0 aggiornando i possibili orsservatori interessati
     	this.inGame = true;
 		
 	}
@@ -47,9 +52,10 @@ public class Model {
 			throw new InvalidParameterException("Tentativo fuori range");
 		}
 		
-		this.tentativi++;
+		//this.tentativi++;
+		this.tentativi.set(this.tentativi.get()+1);
 		
-		if (this.tentativi == this.TMAX) {
+		if (this.tentativi.get() == this.TMAX) {
 			this.inGame = false;
 		}
 		
@@ -77,9 +83,9 @@ public class Model {
 		return inGame;
 	}
 	
-	public int getTentativi() {
-		return this.tentativi;
-	}
+	//public int getTentativi() {
+		//return this.tentativi;
+	//}
 
 	public int getNMAX() {
 		return NMAX;
@@ -93,4 +99,13 @@ public class Model {
 		return this.segreto;
 	}
 
+	public final IntegerProperty tentativiProperty() { // restituisce la property come oggetto
+		return this.tentativi;
+	}
+	
+
+	public final int getTentativi() { 
+		return this.tentativiProperty().get();
+	}
+		
 }
