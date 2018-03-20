@@ -43,18 +43,34 @@ public class Model {
 			throw new IllegalStateException("Partita non attiva");
 		}
 		
-		if (t<1 || t>this.TMAX) {
+		if (!valoreValido(t)) { // PROGRAMMAZIONE PROTETTIVA
 			throw new InvalidParameterException("Tentativo fuori range");
 		}
 		
 		this.tentativi++;
 		
-		if (t == this.segreto) 
+		if (this.tentativi == this.TMAX) {
+			this.inGame = false;
+		}
+		
+		if (t == this.segreto) {
+			this.inGame = false;
 			return 0;
+		}
 		if (t < this.segreto)
 			return -1;
 		return +1;
 		
+	}
+	
+	/**
+	 * Controlla se il tentativo fornito rispetto le regole formali
+	 * del gioco, cioè è nel range [1, NMAX]
+	 * @param tentativo
+	 * @return {@code true} se tentativo è valido
+	 */
+	public boolean valoreValido(int tentativo) {
+		return tentativo>=1 && tentativo<=this.NMAX;
 	}
 
 	public boolean isInGame() {
@@ -71,6 +87,10 @@ public class Model {
 
 	public int getTMAX() {
 		return TMAX;
+	}
+	
+	public int getSegreto() {
+		return this.segreto;
 	}
 
 }

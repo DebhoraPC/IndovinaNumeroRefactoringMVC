@@ -49,12 +49,12 @@ public class IndoNumeroRefactoringmvcController {
     	btnNuova.setDisable(true); // disattivo il bottono Nuova Partita
     	boxGioco.setDisable(false); // attivo HBox con Tentativo e bottone Prova
     	
-    	txtCurr.setText(String.format("%d", this.tentativi)); 
-    	txtMax.setText(String.format("%d", this.TMAX)); 
+    	txtCurr.setText(String.format("%d", model.getTentativi())); 
+    	txtMax.setText(String.format("%d", model.getTMAX())); 
     	
     	txtLog.clear();
     	txtTentativo.clear();
-    	txtLog.setText(String.format("Indovina un numero tra %d e %d\n", 1, NMAX));
+    	txtLog.setText(String.format("Indovina un numero tra %d e %d\n", 1, model.getNMAX()));
 
     }
 
@@ -70,47 +70,37 @@ public class IndoNumeroRefactoringmvcController {
     	
     	try { // la funzione parseInt genera un'eccezione che devo gestire
     		
-    		int num = Integer.parseInt(numS) ;
+    		int num = Integer.parseInt(numS);
     		// numero era effettivamente un intero
-    		if (num < 0 || num > NMAX) {
+    		
+    		if (!model.valoreValido(num)) {
     			txtLog.appendText("Valore fuori dall'intervallo consentito\n");
     			return;
     		}
     		
-    		if (num == this.segreto) {
-    			
+    		int risultato = model.tentativo(num);
+        	txtCurr.setText(String.format("%d", model.getTentativi())); 
+
+    		
+    		if(risultato == 0) {
     			// indovinato
     			txtLog.appendText("Hai vinto!\n");
+    		} else if(risultato < 0) {
+    			txtLog.appendText("Troppo basso!\n");
+    		} else {
+    			txtLog.appendText("Troppo alto!\n");
+    		}
+    		
+    		if (!model.isInGame()) {
+    			// la partita è finita (vittoria o sconfitta)
     			
-    			// chiudere la partire: disabilitare area gioco e riabilitare bottone Nuova Partita
+    			if (risultato!=0) {
+    				txtLog.appendText("Hai perso!\n");
+    				txtLog.appendText(String.format("Il numero segreto era: %d!\n",model.getSegreto()));
+    			}
+    			// chiudere la partita: disabilitare area gioco e riabilitare bottone Nuova Partita
     			boxGioco.setDisable(true);
     			btnNuova.setDisable(false);
-    			//this.inGame = false;
-    			
-    		} else {
-    			
-    			// tentativo errato
-    			this.tentativi++;
-    			txtCurr.setText(String.format("%d", this.tentativi));
-    			if (this.tentativi==this.TMAX) {
-    				// perso
-    				txtLog.appendText(String.format("Hai perso! Il numero era: %d\n", this.segreto));
-    				
-    				// chiudere la partire: disabilitare area gioco e riabilitare bottone Nuova Partita
-        			boxGioco.setDisable(true);
-        			btnNuova.setDisable(false);
-        			//this.inGame = false;
-        			
-    			} else {
-    				// ancora in gioco
-    				if (num < segreto) {
-    					// troppo basso
-    					txtLog.appendText("Troppo basso\n");
-    				} else {
-    					// troppo alto
-    					txtLog.appendText("Troppo alto\n");
-    				}
-    			}
     		}
     	// PER AVERE IL SUGGERIMENTO SULLE ECCEZIONI O ALTRO FARE Ctrl + Spazio
     	} catch (NumberFormatException ex)  {
