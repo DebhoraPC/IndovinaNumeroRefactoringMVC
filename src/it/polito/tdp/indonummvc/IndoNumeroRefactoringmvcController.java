@@ -6,13 +6,14 @@ package it.polito.tdp.indonummvc;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.util.converter.NumberStringConverter;
 
 public class IndoNumeroRefactoringmvcController {
 	
@@ -47,14 +48,15 @@ public class IndoNumeroRefactoringmvcController {
     	
     	model.newGame();
     	
-    	btnNuova.setDisable(true); // disattivo il bottono Nuova Partita
-    	boxGioco.setDisable(false); // attivo HBox con Tentativo e bottone Prova
-    	
+    	// QUESTO E' QUELLO CHE BISOGNA FARE QUANDO NON SI USANO I BINDINGS:
+    	//btnNuova.setDisable(true); // disattivo il bottone Nuova Partita
+    	//boxGioco.setDisable(false); // attivo HBox con Tentativo e bottone Prova
     	//txtCurr.setText(String.format("%d", model.getTentativi())); 
-    	txtMax.setText(String.format("%d", model.getTMAX())); 
+    	//txtMax.setText(String.format("%d", model.getTMAX())); // tentativi massimi permessi
     	
     	txtLog.clear();
     	txtTentativo.clear();
+    	
     	txtLog.setText(String.format("Indovina un numero tra %d e %d\n", 1, model.getNMAX()));
 
     }
@@ -65,7 +67,7 @@ public class IndoNumeroRefactoringmvcController {
     	String numS = txtTentativo.getText() ;
     	
     	if (numS.length() == 0) { 
-    		txtLog.appendText("Devi inserire un numero \n");
+    		txtLog.appendText("Devi inserire un numero\n");
     		return ; 
     	}
     	
@@ -80,9 +82,10 @@ public class IndoNumeroRefactoringmvcController {
     		}
     		
     		int risultato = model.tentativo(num);
+    		
+    		// QUESTO E' QUELLO CHE BISOGNA FARE QUANDO NON SI USANO I BINDINGS:
         	//txtCurr.setText(String.format("%d", model.getTentativi())); 
 
-    		
     		if(risultato == 0) {
     			// indovinato
     			txtLog.appendText("Hai vinto!\n");
@@ -99,10 +102,13 @@ public class IndoNumeroRefactoringmvcController {
     				txtLog.appendText("Hai perso!\n");
     				txtLog.appendText(String.format("Il numero segreto era: %d!\n",model.getSegreto()));
     			}
-    			// chiudere la partita: disabilitare area gioco e riabilitare bottone Nuova Partita
-    			boxGioco.setDisable(true);
-    			btnNuova.setDisable(false);
+    			
+    			// QUESTO E' QUELLO CHE BISOGNA FARE QUANDO NON SI USANO I BINDINGS:
+    			// chiudo la partita: disabilito area gioco e riabilito bottone Nuova Partita
+    			//boxGioco.setDisable(true);
+    			//btnNuova.setDisable(false);
     		}
+    		
     	// PER AVERE IL SUGGERIMENTO SULLE ECCEZIONI O ALTRO FARE Ctrl + Spazio
     	} catch (NumberFormatException ex)  {
     		txtLog.setText("Il dato inserito non è numerico \n");
@@ -126,7 +132,14 @@ public class IndoNumeroRefactoringmvcController {
 		
 		this.model = model;
 		
-		txtCurr.textProperty().bindBidirectional(model.tentativiProperty(), new NumberStringConverter());
+		// AGGIORNA AUTOMATICAMENTE I TENTATIVI FATTI E QUELLI TOTALI (BINDINGS)
+		txtCurr.textProperty().bind(Bindings.convert(model.tentativiProperty()));
+		txtMax.textProperty().bind(Bindings.convert(model.NMAXProperty()));
+		
+		// LE AREE DELLINTERFACCIA SI ABILITANO-DISABILITANO AUTOMATICAMENTE IN FUNZIONE DI inGame (BINDINGS)
+		btnNuova.disableProperty().bind(model.inGameProperty());
+		boxGioco.disableProperty().bind(Bindings.not(model.inGameProperty()));
+		
 	}
 	
 }
